@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="popup">
+  <nav class="tabs">
+    <button id="tab-log" class="active">Log</button>
+    <button id="tab-due">Due</button>
+    <button id="open-settings" class="gear" title="Settings">⚙</button>
+  </nav>
+
+  <section id="setup" class="hidden">
+    <p>Connect Notion first.</p>
+    <button class="primary" id="setup-btn">Open settings</button>
+  </section>
+
+  <section id="log">
+    <p id="log-msg" class="muted">Loading…</p>
+    <form id="form" class="hidden">
+      <p class="title"><a id="p-title" target="_blank"></a></p>
+      <div class="meta"><span id="p-diff"></span> · <span id="p-topics"></span></div>
+
+      <div class="row">
+        <div>
+          <label for="minutes">Time spent (min)</label>
+          <input id="minutes" type="number" min="0" step="1">
+        </div>
+        <div>
+          <label for="review">Review</label>
+          <select id="review"></select>
+        </div>
+      </div>
+
+      <label>Progress</label>
+      <div class="chips" id="progress"></div>
+
+      <label for="note">Notes</label>
+      <textarea id="note" placeholder="Approach, mistakes, complexity…"></textarea>
+
+      <div id="existing" class="note hidden">
+        <div>Already logged <b id="ex-date"></b> · <a id="ex-link" target="_blank">open in Notion</a></div>
+        <details id="ex-notes-wrap"><summary class="muted">Previous notes</summary><pre id="ex-notes"></pre></details>
+      </div>
+
+      <div class="actions">
+        <span id="status" class="status"></span>
+        <button class="primary" id="save" type="submit">Add to Notion</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="due" class="hidden">
+    <p id="due-msg" class="muted">Loading…</p>
+    <ul id="due-list" class="due"></ul>
+  </section>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

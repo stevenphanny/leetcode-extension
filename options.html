@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>LeetCode → Notion settings</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="options">
+  <h1>LeetCode → Notion</h1>
+
+  <div class="card">
+    <b>1. Notion integration token</b>
+    <ol>
+      <li>Go to <a href="https://www.notion.so/profile/integrations" target="_blank">notion.so/profile/integrations</a> → <i>New integration</i> (type: Internal).</li>
+      <li>Copy the <i>Internal Integration Secret</i> and paste it below.</li>
+      <li>In Notion, open the page where the database should live → <i>⋯</i> → <i>Connections</i> → add your integration.</li>
+    </ol>
+    <label for="token">Token</label>
+    <input id="token" type="password" placeholder="ntn_… or secret_…">
+    <div class="actions">
+      <span id="token-status" class="status"></span>
+      <button class="primary" id="connect">Save &amp; connect</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="db-card">
+    <b>2. Database</b>
+    <label for="parent">Create a new tracker database inside page</label>
+    <div class="row">
+      <select id="parent"></select>
+      <button class="primary" id="create" style="flex:0 0 auto">Create</button>
+    </div>
+    <div id="existing-wrap" class="hidden">
+      <label for="existing">…or use an existing tracker database</label>
+      <div class="row">
+        <select id="existing"></select>
+        <button id="use" style="flex:0 0 auto">Use</button>
+      </div>
+    </div>
+    <p id="db-status" class="status"></p>
+  </div>
+
+  <div class="card">
+    <b>Status</b>
+    <p id="current" class="muted">Not set up.</p>
+    <p class="muted">Tip: in Notion, add a view on the database filtered by
+      <i>Next Review ≤ Today</i> to see what's due without the extension.</p>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

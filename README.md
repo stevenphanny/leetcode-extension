@@ -47,6 +47,8 @@ In settings (step 3) pick a provider and paste its key:
   solution). *Add complexity to notes* drops the result into the Log tab's notes.
 - **Hint** gives the smallest useful hint for your current code; press again for the next
   one, or type what's going wrong. The thread is saved per problem; **Reset** clears it.
+- Requests run in the background (`background.js`), so closing the popup mid-request is
+  fine: reopen it and the result is there. Unsent hint text is kept too.
 
 ## Updating
 Edit the files, then hit the ↻ reload icon on the extension in `chrome://extensions`, and

@@ -6,14 +6,18 @@
 </head>
 <body class="popup">
   <nav class="tabs">
-    <button id="tab-log" class="active">Log</button>
-    <button id="tab-due">Due</button>
-    <button id="tab-ai">AI</button>
-    <button id="open-settings" class="gear" title="Settings">⚙</button>
+    <div class="seg">
+      <button id="tab-log" class="active">Log</button>
+      <button id="tab-due">Due</button>
+      <button id="tab-ai">AI</button>
+    </div>
+    <button id="open-settings" class="icon-btn" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
   </nav>
 
   <section id="setup" class="hidden">
-    <p>Connect Notion first.</p>
+    <p class="muted">Connect Notion to log problems and see what's due.</p>
     <button class="primary" id="setup-btn">Open settings</button>
   </section>
 
@@ -21,7 +25,7 @@
     <p id="log-msg" class="muted">Loading…</p>
     <form id="form" class="hidden">
       <p class="title"><a id="p-title" target="_blank"></a></p>
-      <div class="meta"><span id="p-diff"></span> · <span id="p-topics"></span></div>
+      <div class="meta"><span id="p-diff" class="pill"></span><span id="p-topics" class="topics"></span></div>
 
       <div class="row">
         <div>
@@ -41,7 +45,7 @@
       <textarea id="note" placeholder="Approach, mistakes, complexity…"></textarea>
 
       <div id="existing" class="note hidden">
-        <div>Already logged <b id="ex-date"></b> · <a id="ex-link" target="_blank">open in Notion</a></div>
+        <div class="line"><span>Logged <b id="ex-date"></b></span><a id="ex-link" target="_blank">Open in Notion</a></div>
         <details id="ex-notes-wrap"><summary class="muted">Previous notes</summary><pre id="ex-notes"></pre></details>
       </div>
 
@@ -60,19 +64,31 @@
   <section id="ai" class="hidden">
     <p id="ai-msg" class="muted hidden"></p>
     <div id="ai-body">
-      <div class="actions" style="margin-top:0">
-        <span class="status muted">Checks the code in the editor.</span>
-        <button class="primary" id="analyse">Analyse</button>
+      <div class="block">
+        <div class="block-head">
+          <div>
+            <h2>Check my solution</h2>
+            <span id="analyse-status" class="status muted">Complexity and constraints, about 15–20s.</span>
+          </div>
+          <button class="primary" id="analyse">Analyse</button>
+        </div>
+        <div id="analysis" class="hidden"></div>
       </div>
-      <div id="analysis" class="hidden"></div>
 
-      <label for="help-q">Stuck? Ask for a hint</label>
-      <div id="chat" class="chat"></div>
-      <textarea id="help-q" placeholder="Optional: what's going wrong? (Ctrl+Enter to send)"></textarea>
-      <div class="actions">
-        <button id="help-reset" type="button" title="Start a fresh hint thread">Reset</button>
+      <div class="block">
+        <div class="block-head">
+          <div>
+            <h2>Stuck?</h2>
+            <span class="status muted">Hints that point the way, not the answer.</span>
+          </div>
+        </div>
+        <div id="chat" class="chat"></div>
+        <textarea id="help-q" placeholder="What's going wrong? (optional, Ctrl+Enter sends)"></textarea>
         <span id="help-status" class="status"></span>
-        <button class="primary" id="help-send" type="button">Hint</button>
+        <div class="actions split">
+          <button id="help-reset" class="ghost" type="button" title="Start a fresh hint thread">Start over</button>
+          <button class="primary" id="help-send" type="button">Get a hint</button>
+        </div>
       </div>
     </div>
   </section>

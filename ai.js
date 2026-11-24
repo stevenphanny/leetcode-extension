@@ -31,27 +31,37 @@ async function callGemini({ key, geminiModel }, { system, messages, schema, maxT
     generationConfig.responseMimeType = 'application/json';
     system += `\n\nRespond with only a JSON object matching this JSON Schema:\n${JSON.stringify(schema)}`;
   }
-  const body = JSON.stringify({
-    systemInstruction: { parts: [{ text: system }] },
-    contents: messages.map((m) => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
-    })),
-    generationConfig,
-  });
+  // Low thinking = much faster; these tasks don't need deep reasoning. If a model
+  // rejects the field, remember that and send without it.
+  const { geminiNoThinkingCfg } = await chrome.storage.local.get('geminiNoThinkingCfg');
+  if (!geminiNoThinkingCfg) generationConfig.thinkingConfig = { thinkingLevel: 'LOW' };
+  const body = () =>
+    JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: messages.map((m) => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      })),
+      generationConfig,
+    });
 
-  // Free-tier models are often overloaded (503) or rate limited (429, per model).
-  // Retry the chosen model once, then fall back through the other free models.
-  const attempts = [geminiModel, geminiModel, ...GEMINI_FALLBACKS.filter((m) => m !== geminiModel)];
+  // Free-tier models are often overloaded (503) or rate limited (429, per model):
+  // go straight to the next free model instead of waiting.
+  const attempts = [geminiModel, ...GEMINI_FALLBACKS.filter((m) => m !== geminiModel)];
   let res, data;
   for (let i = 0; i < attempts.length; i++) {
-    if (i === 1) await new Promise((r) => setTimeout(r, 2000));
     res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${attempts[i]}:generateContent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body,
+      body: body(),
     });
     data = await res.json().catch(() => ({}));
+    if (res.status === 400 && generationConfig.thinkingConfig && /thinking/i.test(data.error?.message || '')) {
+      delete generationConfig.thinkingConfig;
+      await chrome.storage.local.set({ geminiNoThinkingCfg: true });
+      i--; // same model again, without the field
+      continue;
+    }
     if (![429, 500, 503, 504].includes(res.status)) break;
   }
   if (res.status === 429) throw new Error('Gemini free-tier limits hit on every model — try again later.');
@@ -80,7 +90,7 @@ async function callClaude(anthropicKey, { system, messages, schema, maxTokens = 
   const body = {
     model: 'claude-haiku-5-5', // cheapest Claude model: $0.10 / $0.50 per MTok
     max_tokens: maxTokens,
-    output_config: { effort: 'medium' },
+    output_config: { effort: 'low' },
     system,
     messages,
   };

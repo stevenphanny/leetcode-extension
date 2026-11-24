@@ -6,6 +6,8 @@ export const PROVIDERS = {
   anthropic: { label: 'Anthropic Claude Haiku (paid)', keyField: 'anthropicKey' },
 };
 export const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
+// Free-tier models to fall back to when the chosen one is busy, best first.
+const GEMINI_FALLBACKS = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
 
 // Settings for the chosen provider; key is undefined if not set.
 export async function aiSettings() {
@@ -29,23 +31,31 @@ async function callGemini({ key, geminiModel }, { system, messages, schema, maxT
     generationConfig.responseMimeType = 'application/json';
     system += `\n\nRespond with only a JSON object matching this JSON Schema:\n${JSON.stringify(schema)}`;
   }
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent`,
-    {
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: system }] },
+    contents: messages.map((m) => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    })),
+    generationConfig,
+  });
+
+  // Free-tier models are often overloaded (503) or rate limited (429, per model).
+  // Retry the chosen model once, then fall back through the other free models.
+  const attempts = [geminiModel, geminiModel, ...GEMINI_FALLBACKS.filter((m) => m !== geminiModel)];
+  let res, data;
+  for (let i = 0; i < attempts.length; i++) {
+    if (i === 1) await new Promise((r) => setTimeout(r, 2000));
+    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${attempts[i]}:generateContent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents: messages.map((m) => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.content }],
-        })),
-        generationConfig,
-      }),
-    }
-  );
-  const data = await res.json().catch(() => ({}));
-  if (res.status === 429) throw new Error('Gemini free-tier rate limit hit — wait a minute and retry.');
+      body,
+    });
+    data = await res.json().catch(() => ({}));
+    if (![429, 500, 503, 504].includes(res.status)) break;
+  }
+  if (res.status === 429) throw new Error('Gemini free-tier limits hit on every model — try again later.');
+  if (res.status >= 500) throw new Error('Gemini is overloaded on every free model right now — try again in a few minutes.');
   if (!res.ok) throw new Error(data.error?.message || `Gemini API error ${res.status}`);
   if (data.promptFeedback?.blockReason) throw new Error(`Gemini blocked the request (${data.promptFeedback.blockReason}).`);
   const cand = data.candidates?.[0];

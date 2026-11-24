@@ -8,6 +8,7 @@
   <nav class="tabs">
     <button id="tab-log" class="active">Log</button>
     <button id="tab-due">Due</button>
+    <button id="tab-ai">AI</button>
     <button id="open-settings" class="gear" title="Settings">⚙</button>
   </nav>
 
@@ -54,6 +55,26 @@
   <section id="due" class="hidden">
     <p id="due-msg" class="muted">Loading…</p>
     <ul id="due-list" class="due"></ul>
+  </section>
+
+  <section id="ai" class="hidden">
+    <p id="ai-msg" class="muted hidden"></p>
+    <div id="ai-body">
+      <div class="actions" style="margin-top:0">
+        <span class="status muted">Checks the code in the editor.</span>
+        <button class="primary" id="analyse">Analyse</button>
+      </div>
+      <div id="analysis" class="hidden"></div>
+
+      <label for="help-q">Stuck? Ask for a hint</label>
+      <div id="chat" class="chat"></div>
+      <textarea id="help-q" placeholder="Optional: what's going wrong? (Ctrl+Enter to send)"></textarea>
+      <div class="actions">
+        <button id="help-reset" type="button" title="Start a fresh hint thread">Reset</button>
+        <span id="help-status" class="status"></span>
+        <button class="primary" id="help-send" type="button">Hint</button>
+      </div>
+    </div>
   </section>
 
   <script type="module" src="popup.js"></script>

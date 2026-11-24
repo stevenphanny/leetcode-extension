@@ -41,6 +41,31 @@
   </div>
 
   <div class="card">
+    <b>3. AI analysis &amp; hints (optional)</b>
+    <label for="ai-provider">Provider</label>
+    <select id="ai-provider"></select>
+    <ol id="help-gemini">
+      <li>Go to <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> and sign in with a Google account.</li>
+      <li><i>Create API key</i> (let it create a project if asked). No billing needed — free tier.</li>
+      <li>Paste it below. Free tier has daily limits, and Google may use free-tier prompts to improve its products.</li>
+    </ol>
+    <ol id="help-anthropic" class="hidden">
+      <li>Create an API key at <a href="https://platform.claude.com/settings/keys" target="_blank">platform.claude.com</a> and add a few dollars of credit.</li>
+      <li>Paste it below. Uses Claude Haiku 5.5 — a fraction of a cent per analysis or hint.</li>
+    </ol>
+    <div id="gemini-model-wrap">
+      <label for="gemini-model">Gemini model</label>
+      <select id="gemini-model"></select>
+    </div>
+    <label for="ai-key" id="ai-key-label">API key</label>
+    <input id="ai-key" type="password" placeholder="Paste key">
+    <div class="actions">
+      <span id="ai-status" class="status"></span>
+      <button class="primary" id="ai-save">Save key</button>
+    </div>
+  </div>
+
+  <div class="card">
     <b>Status</b>
     <p id="current" class="muted">Not set up.</p>
     <p class="muted">Tip: in Notion, add a view on the database filtered by

@@ -37,6 +37,21 @@ sorted ascending, to see due problems inside Notion.
   overwrite; new notes are added on top with a date stamp, old notes kept.
 - **Due** tab lists problems with Next Review ≤ today; click to open.
 
+## AI tab (optional)
+In settings (step 3) pick a provider and paste its key:
+- **Google Gemini (free tier)**: key from <https://aistudio.google.com/apikey>, no billing.
+  Daily rate limits apply, and Google may use free-tier prompts to improve its products.
+- **Anthropic Claude Haiku 5.5 (paid)**: key from <https://platform.claude.com/settings/keys>.
+- **Analyse** reads the code in the LeetCode editor and reports time/space complexity vs.
+  the best known, whether it fits the problem constraints, likely bugs, and a nudge (no full
+  solution). *Add complexity to notes* drops the result into the Log tab's notes.
+- **Hint** gives the smallest useful hint for your current code; press again for the next
+  one, or type what's going wrong. The thread is saved per problem; **Reset** clears it.
+
+## Updating
+Edit the files, then hit the ↻ reload icon on the extension in `chrome://extensions`, and
+refresh any open LeetCode tabs. Settings and saved data are kept.
+
 ## Notes
 - The token is stored in `chrome.storage.local` on this machine only.
 - Changing Review Frequency directly in Notion does not recompute Next Review;

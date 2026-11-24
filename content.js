@@ -33,7 +33,7 @@
       headers: { 'Content-Type': 'application/json', 'x-csrftoken': csrfToken() },
       body: JSON.stringify({
         query: `query q($titleSlug: String!) {
-          question(titleSlug: $titleSlug) { questionFrontendId title difficulty topicTags { name } }
+          question(titleSlug: $titleSlug) { questionFrontendId title difficulty content topicTags { name } }
         }`,
         variables: { titleSlug: slug },
       }),
@@ -45,7 +45,19 @@
       title: q.title,
       difficulty: q.difficulty,
       topics: q.topicTags.map((t) => t.name),
+      description: htmlToText(q.content),
     };
+  }
+
+  // Problem HTML -> readable text. <sup> becomes ^ so "10<sup>5</sup>" reads "10^5".
+  function htmlToText(html) {
+    if (!html) return '';
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('sup').forEach((el) => (el.textContent = '^' + el.textContent));
+    doc.querySelectorAll('li').forEach((el) => (el.textContent = '- ' + el.textContent));
+    doc.querySelectorAll('br').forEach((el) => el.replaceWith('\n'));
+    doc.querySelectorAll('p, pre, li').forEach((el) => el.append('\n'));
+    return doc.body.textContent.replace(/ /g, ' ').replace(/\n{3,}/g, '\n\n').trim();
   }
 
   function fromDOM() {
@@ -58,6 +70,7 @@
       title: m ? m[2] : title,
       difficulty: diffEl ? diffEl.textContent.trim() : '',
       topics: [...new Set(topics)].filter(Boolean),
+      description: htmlToText(document.querySelector('[data-track-load="description_content"]')?.innerHTML),
     };
   }
 
